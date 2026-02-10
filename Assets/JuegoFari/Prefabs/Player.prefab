@@ -17,7 +17,6 @@ GameObject:
   - component: {fileID: 4415090306928157613}
   - component: {fileID: 5234011430693762994}
   - component: {fileID: 6766860133524198187}
-  - component: {fileID: 4037144802361202971}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -136,6 +135,9 @@ MonoBehaviour:
   moveSpeed: 5
   jumpHeight: 2
   gravity: -9.81
+  jumpKey: 32
+  sprintKey: 304
+  crouchKey: 306
   moveInput: {x: 0, y: 0}
   salto: {fileID: 0}
   pasos: {fileID: 0}
@@ -236,26 +238,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &4037144802361202971
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 774732070517389336}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ff3eeae766430a842aa6f7eb4cdbe43f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::NormalAttack
-  singleDamage: 10
-  multiDamage: 5
-  stunRadius: 5
-  stunDuration: 2
-  stunCoolddown: 10
-  canStun: 1
-  invincibleDuration: 3
-  isInvincible: 0
 --- !u!1 &4883773558519257717
 GameObject:
   m_ObjectHideFlags: 0

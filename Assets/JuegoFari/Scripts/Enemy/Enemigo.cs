@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Enemigo : MonoBehaviour
@@ -9,12 +10,13 @@ public class Enemigo : MonoBehaviour
     public Animator animator;
     public Quaternion angulo;
     public float grado;
+    
 
     public  bool atacando;
     [SerializeField] private BoxCollider colliderAtaque;
 
     public GameObject target;
-
+    public bool isStunned = false;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -27,7 +29,16 @@ public class Enemigo : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        ComportamientoEnemigo();
+        if (!isStunned) 
+        { 
+            ComportamientoEnemigo(); 
+        }
+        else
+        { // Si está aturdido, se queda quieto
+          animator.SetBool("walk", false);
+          animator.SetBool("run", false); 
+          animator.SetBool("attack", false); 
+        }
     }
 
     public void ComportamientoEnemigo()
@@ -88,6 +99,23 @@ public class Enemigo : MonoBehaviour
     {
         animator.SetBool("attack", false);
         atacando = false;
+    }
+
+    public void ApplyStun(float duration)
+    {
+        if (!isStunned)
+        {
+            StartCoroutine(StunEffect(duration)); // Inicia la corrutina para el efecto de aturdimiento
+        }
+    }
+
+    IEnumerator StunEffect(float duration)
+    {
+        isStunned = true; // Marca al enemigo como aturdido
+        Debug.Log("Enemigo aturdido por " + duration + " segundos"); // Imprime un mensaje en la consola indicando que el enemigo está aturdido
+        yield return new WaitForSeconds(duration); // Espera la duración del aturdimiento
+        isStunned = false; // Marca al enemigo como no aturdido
+        Debug.Log("Enemigo recuperado del aturdimiento"); // Imprime un mensaje en la consola indicando que el enemigo se ha recuperado del aturdimiento
     }
 
     //private void OnTriggerEnter(Collider other)
