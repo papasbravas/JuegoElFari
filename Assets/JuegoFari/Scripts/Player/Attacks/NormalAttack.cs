@@ -1,27 +1,38 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class NormalAttack : MonoBehaviour
 {
-    [Header("Daño y Aturdimiento")]
+    [Header("Daño y Hitbox")]
     [SerializeField] public float singleDamage = 10f; // Daño hecho por un ataque normal
     [SerializeField] public float multiDamage = 5f; // Daño hecho por un ataque múltiple
+    [SerializeField] private GameObject attackHitboxSingle;
+    [SerializeField] private GameObject attackHitboxMulti;
+
+    [Header("Habilidad 1: Aturdimiento")]
+    [SerializeField] public Image imageStun; // Imagen del botón de aturdimiento en el HUD
     [SerializeField] public float stunRadius = 5f; // Radio de aturdimiento
     [SerializeField] public float stunDuration = 2f; // Duración del aturdimiento
     [SerializeField] public float stunCoolddown = 10f; // Tiempo de recarga del aturdimiento
     [SerializeField] public bool canStun = true; // Indica si el jugador puede aturdir
-    [SerializeField] private GameObject attackHitboxSingle;
-    [SerializeField] private GameObject attackHitboxMulti;
 
-    [Header("Invencible")]
+
+    [Header("Habilidad 2: Invencible")]
+    [SerializeField] public Image imageInvincible; // Imagen del botón de invencibilidad en el HUD
     [SerializeField] public float invincibleDuration = 3f; // Duración de la invencibilidad
     [SerializeField] public bool isInvincible = false; // Indica si el jugador es invencible
     [SerializeField] public float invincibleCooldown = 25f; // Tiempo de recarga de la invencibilidad
+    [SerializeField] public bool canUseInvincible = true;
 
-    private Animator anima; // Referencia al componente Animator
+
+    [Header("Animaciones")]
+    [SerializeField] private Animator anima; // Referencia al componente Animator
 
     private void Start()
     {
+        imageStun.fillAmount = 0f; // Asegura que la imagen del botón de aturdimiento esté llena al inicio
+        imageInvincible.fillAmount = 0f; // Asegura que la imagen del botón de invencibilidad esté llena al inicio
         anima = GetComponent<Animator>();
     }
 
@@ -44,18 +55,21 @@ public class NormalAttack : MonoBehaviour
                 Debug.Log("Aturdimiento activado");
                 areaStun();
                 canStun = false; // Desactiva el aturdimiento hasta que se recargue
-                //StartCoroutine(StunCooldown());
+                StartCoroutine(StunCooldown());
+                StartCoroutine(StunCooldownUI());
+
             }
         }
         if (Input.GetKeyDown(KeyCode.I))
         {
-            if (!isInvincible)
+            if (canUseInvincible)
             {
                 Debug.Log("Invencibilidad activada");
-                invincibilityBuff();
-                GetComponent<PlayerHealth>().isInvincible = true;
+                StartCoroutine(invencibleBuff());
                 StartCoroutine(invencibleCooldown());
+                StartCoroutine(InvencibleCooldownUI());
             }
+
         }
     }
 
@@ -109,7 +123,7 @@ public class NormalAttack : MonoBehaviour
         }
 
         yield return new WaitForSeconds(stunDuration); // Espera la duración del aturdimiento antes de permitir otro aturdimiento
-        StartCoroutine(StunCooldown());
+        //StartCoroutine(StunCooldown());
     }
 
     IEnumerator StunCooldown()
@@ -120,24 +134,59 @@ public class NormalAttack : MonoBehaviour
         Debug.Log("Stun listo otra vez"); // Imprime un mensaje indicando que el aturdimiento está listo nuevamente
     }
 
-    void invincibilityBuff()
-    {
-        StartCoroutine(invencibleBuff());
-    }
-
     IEnumerator invencibleBuff()
     {
-        // Lógica para el buff de invencibilidad
-        
+        isInvincible = true;
+        GetComponent<PlayerHealth>().isInvincible = true;
+
         yield return new WaitForSeconds(invincibleDuration);
+
+        isInvincible = false;
+        GetComponent<PlayerHealth>().isInvincible = false;
+
+        Debug.Log("Invencibilidad terminada");
     }
+
 
     IEnumerator invencibleCooldown()
     {
-        Debug.Log("Cooldown de invencibilidad iniciado"); // Imprime un mensaje indicando que el cooldown ha comenzado
-        yield return new WaitForSeconds(invincibleCooldown); // Espera el tiempo de recarga de la invencibilidad
-        GetComponent<PlayerHealth>().isInvincible = false;
-        Debug.Log("Invencibilidad lista otra vez"); // Imprime un mensaje indicando que la invencibilidad está lista nuevamente
+        canUseInvincible = false;
+
+        Debug.Log("Cooldown de invencibilidad iniciado");
+        yield return new WaitForSeconds(invincibleCooldown);
+
+        canUseInvincible = true;
+        Debug.Log("Invencibilidad lista otra vez");
     }
+
+
+    IEnumerator StunCooldownUI()
+    {
+        float tiempo = stunCoolddown;
+        imageStun.fillAmount = 1f;
+
+        while (tiempo > 0)
+        {
+            tiempo -= Time.deltaTime;
+            imageStun.fillAmount = tiempo / stunCoolddown;
+            yield return null;
+        }
+
+        imageStun.fillAmount = 0f;
+    }
+
+    IEnumerator InvencibleCooldownUI()
+    {
+        float tiempo = invincibleCooldown;
+        imageInvincible.fillAmount = 1f;
+        while (tiempo > 0)
+        {
+            tiempo -= Time.deltaTime;
+            imageInvincible.fillAmount = tiempo / invincibleCooldown;
+            yield return null;
+        }
+        imageInvincible.fillAmount = 0f;
+    }
+
 }
 
